@@ -1,0 +1,15 @@
+Package: epicrpexa
+Title: EPIC-R Model Wrapper for ModelsCloud
+Version: 0.1.0
+Authors@R:
+    person("Mohsen", "Sadatsafavi", email = "mohsen.sadatsafavi@ubc.ca",
+           role = c("aut", "cre"))
+Description: Server-side wrapper around the epicR COPD policy simulation model,
+    exposing a standard ModelsCloud API (model_run, get_default_input) for
+    deployment on pexacloud.
+License: GPL-3
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+Imports:
+    epicR
+Config/roxygen2/version: 8.0.0
