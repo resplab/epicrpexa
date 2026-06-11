@@ -7,11 +7,13 @@
 get_default_input()
 }
 \value{
-A named list of input parameter values, suitable for passing
-directly to \code{\link[=model_run]{model_run()}} as \code{model_input}.
+A named list suitable for passing directly to \code{\link[=model_run]{model_run()}} as
+\code{model_input}.
 }
 \description{
-Returns the default input parameter set from \code{epicR::get_input()}, with the
-metadata (\code{help}, \code{ref}, \code{config}) stripped — only the \verb{$values} list is
-returned, which is what \code{\link[=model_run]{model_run()}} and \code{epicR::simulate()} expect.
+Returns a ready-to-use \code{model_input} for \code{\link[=model_run]{model_run()}}: a named list with an
+\code{input} element holding epicR's default parameter set (from
+\code{epicR::get_input()}, metadata stripped). Add scalar \code{epicR::simulate()}
+controls as needed before calling \code{\link[=model_run]{model_run()}}, e.g.
+\verb{x <- get_default_input(); x$n_agents <- 1e6; model_run(x)}.
 }

@@ -4,26 +4,26 @@
 \alias{model_run}
 \title{Run the EPIC-R COPD policy simulation}
 \usage{
-model_run(model_input = NULL, n_agents = NULL, seed = NULL, extended = FALSE)
+model_run(model_input = NULL)
 }
 \arguments{
-\item{model_input}{Named list of input parameters, as returned by
-\code{\link[=get_default_input]{get_default_input()}}. If \code{NULL}, epicR uses its built-in defaults.}
-
-\item{n_agents}{Integer. Number of simulated agents. Higher values give more
-precise estimates at the cost of runtime. If \code{NULL}, uses the epicR default.}
-
-\item{seed}{Integer. Random seed for reproducibility. \code{NULL} means no seed.}
-
-\item{extended}{Logical. If \code{FALSE} (default), returns only the basic
-summary data frame. If \code{TRUE}, returns the full list with both \verb{$basic}
-and \verb{$extended} results.}
+\item{model_input}{Named list of \code{epicR::simulate()} arguments. If \code{NULL},
+epicR's built-in defaults are used.}
 }
 \value{
-If \code{extended = FALSE}: the basic summary data frame. If
-\code{extended = TRUE}: a list with \verb{$basic} and \verb{$extended}.
+A list with \verb{$basic} (summary) and, when requested, \verb{$extended}.
 }
 \description{
-Wraps \code{epicR::simulate()}. Pass the list returned by \code{\link[=get_default_input]{get_default_input()}}
-as \code{model_input} and optionally override agent count and seed.
+Wraps \code{epicR::simulate()} behind the universal single-\code{model_input}
+interface. \code{model_input} is a named list whose elements are the arguments of
+\code{epicR::simulate()} (e.g. \code{input}, \code{n_agents}, \code{seed}, \code{time_horizon}); it is
+expanded onto those parameters via \code{do.call()}. This keeps one standard
+interface while still letting callers set scalar controls such as \code{n_agents}.
+}
+\details{
+Start from \code{\link[=get_default_input]{get_default_input()}} and add whatever you need:
+\verb{x <- get_default_input(); x$n_agents <- 1e6; model_run(x)}.
+
+Defaults to basic (summary) results only; include \code{extended_results = TRUE}
+in \code{model_input} to also compute the detailed \verb{$extended} table.
 }

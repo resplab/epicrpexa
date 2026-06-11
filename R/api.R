@@ -1,45 +1,47 @@
 #' Run the EPIC-R COPD policy simulation
 #'
-#' Wraps `epicR::simulate()`. Pass the list returned by [get_default_input()]
-#' as `model_input` and optionally override agent count and seed.
+#' Wraps `epicR::simulate()` behind the universal single-`model_input`
+#' interface. `model_input` is a named list whose elements are the arguments of
+#' `epicR::simulate()` (e.g. `input`, `n_agents`, `seed`, `time_horizon`); it is
+#' expanded onto those parameters via `do.call()`. This keeps one standard
+#' interface while still letting callers set scalar controls such as `n_agents`.
 #'
-#' @param model_input Named list of input parameters, as returned by
-#'   [get_default_input()]. If `NULL`, epicR uses its built-in defaults.
-#' @param n_agents Integer. Number of simulated agents. Higher values give more
-#'   precise estimates at the cost of runtime. If `NULL`, uses the epicR default.
-#' @param seed Integer. Random seed for reproducibility. `NULL` means no seed.
-#' @param extended Logical. If `FALSE` (default), returns only the basic
-#'   summary data frame. If `TRUE`, returns the full list with both `$basic`
-#'   and `$extended` results.
+#' Start from [get_default_input()] and add whatever you need:
+#' `x <- get_default_input(); x$n_agents <- 1e6; model_run(x)`.
 #'
-#' @return If `extended = FALSE`: the basic summary data frame. If
-#'   `extended = TRUE`: a list with `$basic` and `$extended`.
+#' Defaults to basic (summary) results only; include `extended_results = TRUE`
+#' in `model_input` to also compute the detailed `$extended` table.
+#'
+#' @param model_input Named list of `epicR::simulate()` arguments. If `NULL`,
+#'   epicR's built-in defaults are used.
+#'
+#' @return A list with `$basic` (summary) and, when requested, `$extended`.
 #' @export
-model_run <- function(
-  model_input = NULL,
-  n_agents    = NULL,
-  seed        = NULL,
-  extended    = FALSE
-) {
-  res <- epicR::simulate(
-    input            = model_input,
-    n_agents         = n_agents,
-    seed             = seed,
-    extended_results = extended
-  )
-  if (extended) res else res$basic
+model_run <- function(model_input = NULL) {
+  if (is.null(model_input)) model_input <- list()
+
+  # Basic-only by default (epicR's own default is extended = TRUE, which is
+  # wasteful when only the summary is needed). Callers can opt back in.
+  if (is.null(model_input$extended_results)) {
+    model_input$extended_results <- FALSE
+  }
+
+  # model_input carries simulate()'s arguments as named elements; expand them.
+  do.call(epicR::simulate, model_input)
 }
 
 
 #' Get the default input for the EPIC-R model
 #'
-#' Returns the default input parameter set from `epicR::get_input()`, with the
-#' metadata (`help`, `ref`, `config`) stripped — only the `$values` list is
-#' returned, which is what [model_run()] and `epicR::simulate()` expect.
+#' Returns a ready-to-use `model_input` for [model_run()]: a named list with an
+#' `input` element holding epicR's default parameter set (from
+#' `epicR::get_input()`, metadata stripped). Add scalar `epicR::simulate()`
+#' controls as needed before calling [model_run()], e.g.
+#' `x <- get_default_input(); x$n_agents <- 1e6; model_run(x)`.
 #'
-#' @return A named list of input parameter values, suitable for passing
-#'   directly to [model_run()] as `model_input`.
+#' @return A named list suitable for passing directly to [model_run()] as
+#'   `model_input`.
 #' @export
 get_default_input <- function() {
-  epicR::get_input()$values
+  list(input = epicR::get_input()$values)
 }
